@@ -34,6 +34,7 @@ def split_sequences(sequences, n_steps):
 		X.append(seq_x)
 		y.append(seq_y)
 	return np.array(X), np.array(y)
+    
 inputs = ["cases", "deaths"]
 for var in inputs:
     data[var] = data[var].diff()
