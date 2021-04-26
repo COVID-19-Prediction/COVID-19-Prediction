@@ -49,7 +49,7 @@ testY = data.loc[:, outputs]
 dates = data["date"]
 
 predY = model.predict(testX, verbose=0)
-
+plt.figure(figsize=(9, 6))
 plt.plot(dates, data["cases+1"], label="Real cases")
 plt.plot(dates, data["deaths+1"], label="Real deaths")
 plt.plot(dates, predY[:, 0], label="Pred cases")

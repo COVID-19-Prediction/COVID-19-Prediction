@@ -51,12 +51,12 @@ testY = data.loc[:, outputs]
 dates = data["date"]
 
 predY = model.predict(testX, verbose=0)
-
-plt.subplot(1, 2, 1)
+plt.figure(1)
 plt.plot(dates, data["cases+1"], label="Real cases")
 plt.plot(dates, predY[:, 0], label="Pred cases")
+plt.title("Prediction vs Result")
 plt.legend()
-plt.subplot(1, 2, 2)
+plt.figure(2)
 plt.plot(dates, data["deaths+1"], label="Real deaths")
 plt.plot(dates, predY[:, 1], label="Pred deaths")
 plt.legend()
