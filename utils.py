@@ -24,6 +24,28 @@ def split_sequences(sequences, before):
 		y.append(seq_y)
 	return np.array(X), np.array(y)
 
+def split_sequences(sequences, before):
+	X, y = [], []
+	for i in range(len(sequences)):
+		end = i + before
+		if end > len(sequences)-1:
+			break
+		seq_x, seq_y = sequences[i:end, :], sequences[end, :]
+		X.append(seq_x)
+		y.append(seq_y)
+	return np.array(X), np.array(y)
+
+def split_sequences_outputs(sequences, before, outputs_idx):
+	X, y = [], []
+	for i in range(len(sequences)):
+		end = i + before
+		if end > len(sequences)-1:
+			break
+		seq_x, seq_y = sequences[i:end, :], sequences[end, outputs_idx]
+		X.append(seq_x)
+		y.append(seq_y)
+	return np.array(X), np.array(y)
+
 def timesplit(df: pd.DataFrame, t, vars: List[str]):
     assert t > 0, "Timeshift must be larger than 0"
     out_df = df.iloc[t:-2]
