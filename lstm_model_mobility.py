@@ -63,7 +63,7 @@ dates, test_dates = split_sequences(data["date"].to_numpy().reshape(-1, 1), n_st
 
 def lstm_model(n_steps, inputs, outputs):
 	model = Sequential()
-	model.add(LSTM(32, activation='relu', return_sequences=False, input_shape=(n_steps, len(inputs))))
+	model.add(LSTM(100, activation='relu', return_sequences=False, input_shape=(n_steps, len(inputs))))
 	model.add(Dense(len(outputs)))
 	model.compile(optimizer='adam', loss='mae')
 	return model
