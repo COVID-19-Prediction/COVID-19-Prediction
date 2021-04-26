@@ -19,6 +19,9 @@ pd.set_option('display.max_rows', df.shape[0]+1)
 data = df[(df.county == 'Cuyahoga') & (df.state == 'Ohio')]
 data, outputs, inputs = location_data.timesplit(data, 2, ["cases", "deaths"])
 data["date"] = pd.to_datetime(data["date"], format="%Y-%m-%d")
+for var in inputs + outputs:
+    data[var] = data[var].diff()
+
 
 def window_model(input_dim, output_dim):
     model = Sequential()
@@ -29,6 +32,9 @@ def window_model(input_dim, output_dim):
     model.add(Dense(output_dim, kernel_initializer='normal'))
     model.compile(loss="mean_squared_error", optimizer='adam', metrics=["mape", "accuracy"])
     return model
+
+print(inputs)
+print(outputs)
 
 train_mask = data['date'] < pd.Timestamp(2020, 12, 31)
 test_mask = data['date'] >= pd.Timestamp(2021, 1, 1)

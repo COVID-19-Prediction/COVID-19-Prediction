@@ -4,11 +4,16 @@ from typing import List
 def timesplit(df: pd.DataFrame, t, vars: List[str]):
     assert t > 0, "Timeshift must be larger than 0"
     out_df = df.iloc[t:-2]
+    plus_range = []
+    minus_range = []
     for var in vars:
         out_df[f"{var}+1"] = df[var].shift(-1)
+        plus_range.append(f"{var}+1")
+        minus_range.append(var)
         for i in range(1, t+1):
             out_df[f"{var}-{i}"] = df[var].shift(i)
-    return out_df
+            minus_range.append(f"{var}-{i}")
+    return out_df, plus_range, minus_range
 
 if __name__ == "__main__":
     df = pd.read_csv('us-counties.csv')

@@ -32,8 +32,8 @@ def window_model(input_dim, output_dim):
     model.add(Dense(6, activation='relu'))
     model.add(Dense(6, activation='relu'))
     model.add(Dense(6, activation='relu'))
-    model.add(Dense(output_dim, kernel_initializer='normal'))
-    model.compile(loss="mean_squared_error", optimizer='adam', metrics=["mape", "accuracy"])
+    model.add(Dense(output_dim))
+    model.compile(loss="mae", optimizer='adam', metrics=["mape", "accuracy"])
     return model
 
 print(inputs)
@@ -44,7 +44,7 @@ test_mask = data['date'] >= pd.Timestamp(2021, 1, 1)
 trainX = data.loc[train_mask, inputs]
 trainY = data.loc[train_mask, outputs]
 model = window_model(len(inputs), len(outputs))
-model.fit(trainX, trainY, nb_epoch=500, batch_size=50, verbose=2, validation_split=0.3)
+model.fit(trainX, trainY, nb_epoch=1000, batch_size=50, verbose=2, validation_split=0.3)
 
 testX = data.loc[:, inputs]
 testY = data.loc[:, outputs]
