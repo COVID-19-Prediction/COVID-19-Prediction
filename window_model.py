@@ -11,13 +11,14 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 import datetime 
 import matplotlib.pyplot as plt
+from utils import timesplit
 
 location_data = importlib.import_module("location-data")
 
 df = pd.read_csv('us-counties.csv')
 pd.set_option('display.max_rows', df.shape[0]+1)
 data = df[(df.county == 'Cuyahoga') & (df.state == 'Ohio')]
-data, outputs, inputs = location_data.timesplit(data, 2, ["cases", "deaths"])
+data, outputs, inputs = timesplit(data, 2, ["cases", "deaths"])
 data["date"] = pd.to_datetime(data["date"], format="%Y-%m-%d")
 for var in inputs + outputs:
     data[var] = data[var].diff()

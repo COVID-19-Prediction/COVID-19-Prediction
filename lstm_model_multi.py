@@ -11,15 +11,13 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 import datetime 
 import matplotlib.pyplot as plt
-from utils import split_sequences, split_sequences_multi
-
-location_data = importlib.import_module("location-data")
+from utils import split_sequences, split_sequences_multi, timesplit
 
 df = pd.read_csv('us-counties.csv')
 pd.set_option('display.max_rows', df.shape[0]+1)
 data = df[(df.county == 'Cuyahoga') & (df.state == 'Ohio')]
 data["date"] = pd.to_datetime(data["date"], format="%Y-%m-%d")
-timesplit_data, outputs, inputs = location_data.timesplit(data, 2, ["cases", "deaths"])
+timesplit_data, outputs, inputs = timesplit(data, 2, ["cases", "deaths"])
     
 inputs = ["cases", "deaths"]
 for var in inputs:
@@ -45,13 +43,16 @@ _, test_dates = split_sequences(data.loc[test_mask, "date"].to_numpy().reshape(-
 
 print(trainX.shape, trainY.shape)
 
-model = Sequential()
-model.add(LSTM(100, activation='relu', input_shape=(n_steps, len(inputs))))
-model.add(RepeatVector(n_steps_out))
-model.add(LSTM(100, activation='relu', return_sequences=True))
-model.add(TimeDistributed(Dense(len(inputs))))
-model.compile(optimizer='adam', loss='mae')
+def lstm_model(n_steps, n_steps_out, inputs):
+    model = Sequential()
+    model.add(LSTM(100, activation='relu', input_shape=(n_steps, len(inputs))))
+    model.add(RepeatVector(n_steps_out))
+    model.add(LSTM(100, activation='relu', return_sequences=True))
+    model.add(TimeDistributed(Dense(len(inputs))))
+    model.compile(optimizer='adam', loss='mae')
+    return model
 
+model = lstm_model(n_steps, n_steps_out, inputs)
 model.fit(trainX, trainY, nb_epoch=200, batch_size=50, verbose=2, validation_split=0.3)
 predY = model.predict(testX, verbose=0)
 results = model.evaluate(testX, testY, batch_size=50)
