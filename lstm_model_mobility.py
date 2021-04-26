@@ -63,13 +63,13 @@ dates, test_dates = split_sequences(data["date"].to_numpy().reshape(-1, 1), n_st
 
 def lstm_model(n_steps, inputs, outputs):
 	model = Sequential()
-	model.add(LSTM(100, activation='relu', return_sequences=False, input_shape=(n_steps, len(inputs))))
+	model.add(LSTM(50, activation='relu', return_sequences=False, input_shape=(n_steps, len(inputs))))
 	model.add(Dense(len(outputs)))
 	model.compile(optimizer='adam', loss='mae')
 	return model
 
 model = lstm_model(n_steps, inputs, outputs)
-model.fit(trainX, trainY, nb_epoch=200, batch_size=50, verbose=2, validation_split=0.3)
+model.fit(trainX, trainY, nb_epoch=100, batch_size=50, verbose=2, validation_split=0.3)
 predY = model.predict(testX, verbose=0)
 results = model.evaluate(testX_post, testY_post, batch_size=50)
 
