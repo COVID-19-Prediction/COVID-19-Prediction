@@ -2,6 +2,8 @@ from statsmodels.tsa.arima.model import ARIMA
 from utils import *
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.preprocessing import MinMaxScaler
 
 df = pd.read_csv('us-counties.csv')
 pd.set_option('display.max_rows', df.shape[0]+1)
@@ -14,16 +16,24 @@ for var in inputs + outputs:
     data[var] = data[var].rolling(window=5).mean()
 
 data = data.dropna()
-
-model = ARIMA(endog=data["cases"], order=(2, 2, 2))
+scaler = MinMaxScaler(feature_range=(0, 1))
+np_data = data.loc[:, ["cases", "deaths"]].to_numpy()
+train_mask = data['date'] < pd.Timestamp(2020, 12, 31)
+test_mask = data['date'] >= pd.Timestamp(2021, 1, 1)
+np_data = data.loc[:, inputs].to_numpy()
+np_data = scaler.fit_transform(np_data)
+train_data = np_data[train_mask, :]
+test_data = np_data[test_mask, :]
+model = ARIMA(endog=train_data[:, 0], order=(2, 2, 2))
 res = model.fit()
-RANGE = 60
-print(res.get_prediction(end=len(data) + RANGE).predicted_mean)
-new = pd.date_range(data["date"].iloc[0], periods=len(data) + RANGE + 1)
-df = pd.DataFrame(new, columns=['date'])
+test_res = res.apply(test_data[:, 0])
+print(data)
 plt.figure(1)
-plt.plot(data["date"], data["cases"], label="Real cases")
-plt.plot(df["date"], res.get_prediction(end=len(data) + RANGE).predicted_mean, label="Pred cases")
+plt.plot(data.loc[:, "date"], np_data[:, 0], label="Real deaths")
+plt.plot(data.loc[train_mask, "date"], res.get_prediction().predicted_mean, label="Pred deaths")
+plt.plot(data.loc[test_mask, "date"], test_res.get_prediction().predicted_mean, label="Pred deaths with new data")
 plt.legend()
 plt.title("Prediction vs Result")
 plt.show()
+print(mean_squared_error(test_data[:, 0], test_res.get_prediction().predicted_mean))
+print(mean_absolute_error(test_data[:, 0], test_res.get_prediction().predicted_mean))
